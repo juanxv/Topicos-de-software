@@ -1,6 +1,7 @@
 const mongoose = require('mongoose'); //Mongoose me permite conectarme mas facil a la base de datos
-
-mongoose.connect('mongodb://localhost/Usuarios', { //Conecto a la base de datos
+//mongodb://localhost/Usuarios
+//mongodb+srv://juanvx:juan123@cluster0-nxohq.mongodb.net/Usuarios?retryWrites=true&w=majority
+mongoose.connect('mongodb+srv://juanvx:juan123@cluster0-nxohq.mongodb.net/Usuarios?retryWrites=true&w=majority', { //Conecto a la base de datos
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology:true,
