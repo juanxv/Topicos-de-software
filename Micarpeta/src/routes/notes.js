@@ -1,4 +1,8 @@
 const router = require('express').Router(); //Facilita la creacion de rutas
+const multer = require('multer');
+const upload = multer({dest: 'public/img/archivos'})
+const ciudadano = require('../models/Ciudadano');
+const http = require('http');
 
 const Note = require('../models/Note');
 const { isAuthenticated } = require('../helpers/auth');
@@ -7,28 +11,37 @@ router.get('/notes/add', isAuthenticated, (req, res) => {
     res.render('notes/new-notes');
 });
 
-router.post('/notes/new-notes', isAuthenticated, async(req, res) =>{
-    const { title, description } = req.body;
-    const errors = [];
-    if(!title){
-        errors.push({text: 'Por favor ingresa un titulo'});
-    }
-    if(!description){
-        errors.push({text: 'Por favor ingresa una descripcion'});
-    }
-    if(errors.length > 0){
-        res.render('notes/new-notes' , {
-            errors,
-            title,
-            description
-        });
-    }else{
-        const newNote = new Note({title, description});
-        newNote.user = req.user.id;
-        await newNote.save();
-        req.flash('success_msg' , 'Nota agregada');
+router.post('/notes/add/', isAuthenticated, async (req, res) => {
+    const doc = new Note();
+    doc.name = req.body.file;
+    doc.path = 'public/img/archivos/' + req.file.filename;
+    const tor = req.body.file;
+    const tor1 = 'public/img/archivos/' + req.file.filename
+    doc.user = 'user01'
+    console.log(doc);
+    await doc.save();
+    
+    const reque = http.get('http://govCarpetaApp.mybluemix.net/apis/authenticateDocument/' + req.body.id + '/' + tor1.path + '/' + req.body.file, (resp) => {
+        let data = ''
+        resp.on('data', (chunk) => {
+        data += chunk;
+      });
+    
+      // The whole response has been received. Print out the result.
+      resp.on('end', () => {
+          console.log(JSON.parse(data));
+        req.flash('success_msg', JSON.parse(data));
         res.redirect('/notes');
-    }
+      });
+    
+    }).on("error", (err) => {
+      console.log("Error: " + err.message);
+      res.redirect('/notes');
+    });
+});
+
+router.get('/', isAuthenticated, (req, res) => {
+    res.sendFile('/notes/edit-notes.hbs', {root: __dirname})
 });
 
 router.get('/notes', isAuthenticated, async (req, res) =>{
@@ -37,9 +50,10 @@ router.get('/notes', isAuthenticated, async (req, res) =>{
             const context = { //creo una variable para meter los archivos
                 notes: archivos.map(archivos =>{ //mapeo los archivos
                     return { //devuelvo de manera ordenada los archivos
-                        id: archivos._id,
-                        title: archivos.title, 
-                        description: archivos.description
+                        name: archivos.name,
+                        filename: archivos.filename,
+                        path: archivos.path,
+                        date: archivos.date
                     }
                 })
             }
@@ -55,13 +69,17 @@ router.get('/notes/edit/:id', isAuthenticated, async (req, res) => {
 router.put('/notes/edit-notes/:id', isAuthenticated, async(req, res) =>{
     const {title, description } = req.body;
     await Note.findByIdAndUpdate(req.params.id, {title, description})
-    req.flash('success_msg', 'Nota actualizada');
+    req.flash('success_msg', 'Archivo actualizado');
     res.redirect('/notes');
+});
+
+router.get('/notes/file/:id', isAuthenticated, (req, res) => {
+    res.send('Archivo');
 });
 
 router.delete('/notes/delete/:id', isAuthenticated, async(req, res) =>{
     await Note.findByIdAndDelete(req.params.id);
-    req.flash('success_msg', 'Nota eliminada');
+    req.flash('success_msg', 'Archivo eliminado');
     res.redirect('/notes');
 });
 

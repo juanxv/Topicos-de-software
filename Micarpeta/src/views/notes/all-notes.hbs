@@ -1,32 +1,25 @@
 <div class="row">
+    <div class="card mx-auto">
+        <div class="card-body">
+            <h1> Bienvenido a Carpeta Ciudadana {{user.name}}</h1>
+            <a href="/notes/add" class="btn btn-success btn-block">Autenticar archivos</a>
+        </div>
+    </div>
     {{#each notes}}
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title d-flex justify-content-between aligh-items-center">
-                        {{ title }} <a href="/notes/edit/{{id}}"><i class="fas fa-edit"></i></a>
-                    </h4>
-                    <p>
-                        {{ description }}
-                    </p>
-                    <form action="/notes/delete/{{id}}?_method=DELETE" method="POST">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button class="btn btn-danger btn-block btn-sm" type="submit">
-                            Eliminar
-                            </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    {{else}}
-        <div class="card mx-auto">
+    <div class="col-md-3">
+        <div class="card">
             <div class="card-body">
-                <h1> Hola, {{user.name}}</h1>
-                <p class="lead">
-                    Por ahora no tienes notas
-                </p>
-                <a href="/notes/add" class="btn btn-success btn-block">Crea una</a>
+                <h4 class="card-title d-flex justify-content-between aligh-items-center">
+                    {{ path }} <a href="/notes/edit/{{id}}"><i class="fas fa-edit"></i></a>
+                </h4>
+                <form action="/notes/delete/{{id}}?_method=DELETE" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button class="btn btn-danger btn-block btn-sm" type="submit">
+                        Eliminar
+                    </button>
+                </form>
             </div>
         </div>
+    </div>
     {{/each}}
 </div>

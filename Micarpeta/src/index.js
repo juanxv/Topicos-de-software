@@ -5,6 +5,9 @@ const methodOverride = require('method-override'); //Usar otros metodos ademas d
 const session = require('express-session'); //Guardar la sesion del usuario
 const flash = require('connect-flash'); //enviar mensajes entre paginas
 const passport = require('passport'); //Autenticacion
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const uuid = require('uuid');
 
 //Inicializacion
 const app = express();
@@ -33,6 +36,15 @@ app.use(session({
     saveUninitialized: true
 }));
 
+const storage = multer.diskStorage({
+    destination: path.join(__dirname, 'public/img/archivos'),
+    filename: (req, file, cb, filename) => {
+        console.log(file);
+        cb(null, file.originalname);
+    }
+}); 
+app.use(multer({storage}).single('image'));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -54,6 +66,7 @@ app.use((req, res, next) =>{
 app.use(require('./routes/index'));
 app.use(require('./routes/notes'));
 app.use(require('./routes/users'));
+app.use(require('./routes/ciudadano'));
 
 
 //Archivos estaticos
